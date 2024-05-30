@@ -16,27 +16,38 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
-    public ProductController(ProductService productService){
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> displayProductList(){
+    public ResponseEntity<List<ProductDto>> displayProductList() {
         List<ProductDto> productDtoList = productService.getProductList();
         return ResponseEntity.ok(productDtoList);
     }
 
     @GetMapping("/{productName}")
-    public ResponseEntity<ProductDto> productDetails(@PathVariable String productName){
+    public ResponseEntity<ProductDto> productDetails(@PathVariable String productName) {
         ProductDto productDtoDetails = productService.getProductDetails(productName);
         return ResponseEntity.ok(productDtoDetails);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ProductDto> createProducts(@RequestBody ProductDto productDto){
+    public ResponseEntity<ProductDto> createProducts(@RequestBody ProductDto productDto) {
         ProductDto createTheNewProduct = productService.createProductIfNotExists(productDto);
         return ResponseEntity.ok().body(createTheNewProduct);
+    }
 
+    @PutMapping("/update")
+    public ResponseEntity<ProductDto> updateProductDetails(@RequestParam String productName, @RequestBody ProductDto productDto) {
+        ProductDto updatedProductDetails = productService.updateProductByName(productName, productDto);
+        return ResponseEntity.ok().body(updatedProductDetails);
+    }
+
+    @DeleteMapping("/delete/{productName}")
+    public ResponseEntity deleteProduct(@PathVariable String productName) {
+        productService.deleteProductDetails(productName);
+        return ResponseEntity.noContent().build();
     }
 
 

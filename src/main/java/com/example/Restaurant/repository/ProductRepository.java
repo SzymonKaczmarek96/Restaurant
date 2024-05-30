@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product,Long> {
    boolean existsByProductName(String productName);
    Product findByProductName(String productName);
+   void deleteByProductName(String productName);
 }
