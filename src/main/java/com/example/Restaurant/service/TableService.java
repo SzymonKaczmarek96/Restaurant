@@ -2,7 +2,10 @@ package com.example.Restaurant.service;
 
 
 import com.example.Restaurant.dto.TableDto;
-import com.example.Restaurant.entity.*;
+import com.example.Restaurant.entity.ProductOnTable;
+import com.example.Restaurant.entity.ProductsOnTable;
+import com.example.Restaurant.entity.Table;
+import com.example.Restaurant.entity.TableStatus;
 import com.example.Restaurant.exceptions.TableNotExistsException;
 import com.example.Restaurant.exceptions.TableStatusNotExistsException;
 import com.example.Restaurant.repository.ProductRepository;
@@ -11,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TableService {
@@ -92,6 +98,7 @@ public class TableService {
         findTableToModifyProductOnTable.setProductsOnTable(new ProductsOnTable(deleteProductOnTable));
         return tableRepository.save(findTableToModifyProductOnTable).tableToDto();
     }
+
     private void checkTableStatus(String tableStatus) {
         try {
             TableStatus.valueOf(tableStatus);
@@ -99,6 +106,7 @@ public class TableService {
             throw new TableStatusNotExistsException(tableStatus);
         }
     }
+
     private String convertString(String tableStatus) {
         String upperCase = tableStatus.toUpperCase();
         return upperCase;
@@ -109,8 +117,9 @@ public class TableService {
             throw new IllegalArgumentException();
         }
     }
-    private void checkIntroducedSeats(int seats){
-        if(seats <= 0){
+
+    private void checkIntroducedSeats(int seats) {
+        if (seats <= 0) {
             throw new IllegalArgumentException("Seats must be bigger than 0");
         }
     }
@@ -136,7 +145,7 @@ public class TableService {
             if (findProductById.isPresent()) {
                 if (product.getQuantity() >= findProductById.get().getQuantity()) {
                     existingProductList.removeIf(productToDelete -> product.getProductId().equals(productToDelete.getProductId()));
-                } else{
+                } else {
                     findProductById.get().setQuantity(findProductById.get().getQuantity() - product.getQuantity());
                 }
             }

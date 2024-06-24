@@ -34,7 +34,7 @@ public class TableController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<TableDto> createTable(@RequestBody int seats){
+    public ResponseEntity<TableDto> createTable(@RequestBody int seats) {
         TableDto createdTable = tableService.createTable(seats);
         return ResponseEntity.ok().body(createdTable);
     }
@@ -65,7 +65,7 @@ public class TableController {
     }
 
     @PutMapping("/order")
-    public ResponseEntity<TableDto> changeOrder(@RequestParam("id") Long id,@RequestBody Set<ProductOnTable> productList) {
+    public ResponseEntity<TableDto> changeOrder(@RequestParam("id") Long id, @RequestBody Set<ProductOnTable> productList) {
         TableDto changedOrder = tableService.addProductsToTable(id, productList);
         return ResponseEntity.ok().body(changedOrder);
     }

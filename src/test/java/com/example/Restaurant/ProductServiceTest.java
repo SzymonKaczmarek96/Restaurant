@@ -81,8 +81,7 @@ class ProductServiceTest {
         ProductDto productDto = new ProductDto("Coffee", 1000);
         lenient().when(productRepository.existsByProductName(product.getProductName())).thenReturn(false);
         lenient().when(productRepository.findByProductName(product.getProductName())).thenReturn(null);
-        when(productRepository.save(any(Product.class)))
-                .thenReturn(new Product(1L, productDto.productName(), productDto.price()));
+        when(productRepository.save(any(Product.class))).thenReturn(new Product(1L, productDto.productName(), productDto.price()));
         //when
         ProductDto productIfNotExists = productService.createProductIfNotExists(productDto);
         //then
@@ -107,8 +106,7 @@ class ProductServiceTest {
         ProductDto productDto = new ProductDto("Water", 500);
         lenient().when(productRepository.existsByProductName(product.getProductName())).thenReturn(true);
         lenient().when(productRepository.findByProductName(product.getProductName())).thenReturn(product);
-        when(productRepository.save(any(Product.class)))
-                .thenReturn(new Product(1L, productDto.productName(), productDto.price()));
+        when(productRepository.save(any(Product.class))).thenReturn(new Product(1L, productDto.productName(), productDto.price()));
         //when
         ProductDto updatedProduct = productService.updateProductByName(product.getProductName(), productDto);
         //then
@@ -139,8 +137,7 @@ class ProductServiceTest {
         lenient().when(productRepository.existsByProductName(product.getProductName())).thenReturn(true);
         lenient().when(productRepository.findByProductName(product.getProductName())).thenReturn(product);
         //then
-        assertThrows(ProductAlreadyExistsException.class, () ->
-                productService.updateProductByName(product.getProductName(), productDto));
+        assertThrows(ProductAlreadyExistsException.class, () -> productService.updateProductByName(product.getProductName(), productDto));
     }
 
     @Test
@@ -152,8 +149,7 @@ class ProductServiceTest {
         lenient().when(productRepository.existsByProductName(product.getProductName())).thenReturn(true);
         lenient().when(productRepository.findByProductName(product.getProductName())).thenReturn(product);
         //then
-        assertThrows(IllegalArgumentException.class, () ->
-                productService.updateProductByName(product.getProductName(), productDto));
+        assertThrows(IllegalArgumentException.class, () -> productService.updateProductByName(product.getProductName(), productDto));
     }
 
     @Test

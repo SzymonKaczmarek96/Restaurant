@@ -15,27 +15,24 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class TestContainer {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:15")
-            .withDatabaseName("restaurant")
-            .withUsername("postgres")
-            .withPassword("user");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15").withDatabaseName("restaurant").withUsername("postgres").withPassword("user");
 
     @DynamicPropertySource
-    static void configureProperty(DynamicPropertyRegistry registry){
-        registry.add("spring.datasource.url",postgres::getJdbcUrl);
-        registry.add("spring.datasource.username",postgres::getUsername);
-        registry.add("spring.datasource.password",postgres::getPassword);
+    static void configureProperty(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
     }
+
     @BeforeAll
     static void beforeAll() {
         postgres.start();
     }
+
     @AfterAll
     static void afterAll() {
         postgres.stop();
     }
-
 
 
 }

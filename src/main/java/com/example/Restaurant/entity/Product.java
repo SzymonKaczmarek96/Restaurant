@@ -2,11 +2,9 @@ package com.example.Restaurant.entity;
 
 
 import com.example.Restaurant.dto.ProductDto;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.annotation.Scope;
 
 import java.io.Serializable;
 
@@ -17,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "products")
-public class Product implements Serializable{
+public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
