@@ -1,18 +1,21 @@
 package com.example.Restaurant.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Component
 public class ProductsOnTable implements Serializable {
-    private List<Product> productList = new ArrayList<>();
+    private Set<ProductOnTable> products = new HashSet<>();
 }

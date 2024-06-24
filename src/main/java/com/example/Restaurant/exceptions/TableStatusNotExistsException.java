@@ -1,0 +1,13 @@
+package com.example.Restaurant.exceptions;
+
+import com.example.Restaurant.entity.TableStatus;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class TableStatusNotExistsException extends RuntimeException{
+
+   public TableStatusNotExistsException(String tableStatus){
+       super("Status " + tableStatus + " not exists");
+   }
+}

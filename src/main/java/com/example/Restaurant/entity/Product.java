@@ -2,34 +2,33 @@ package com.example.Restaurant.entity;
 
 
 import com.example.Restaurant.dto.ProductDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.context.annotation.Scope;
 
+import java.io.Serializable;
+
+@EqualsAndHashCode
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "products")
-public class Product {
+public class Product implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
 
-
     @Column(name = "product_name", unique = true, nullable = false)
     private String productName;
 
-
     @Column(name = "price", nullable = false)
     private int price;
-
 
     public ProductDto toProductDto() {
         ProductDto productDto = new ProductDto(productName, price);

@@ -69,6 +69,7 @@ class ProductServiceTest {
         //when
         when(productRepository.existsByProductName("Sprite")).thenReturn(false);
         lenient().when(productRepository.findByProductName("Sprite")).thenReturn(null);
+
         //then
         assertThrows(ProductNotExistsException.class, () -> productService.getProductDetails("Sprite"));
     }
@@ -176,8 +177,6 @@ class ProductServiceTest {
 
         //then
         assertThrows(ProductNotExistsException.class, () -> productService.deleteProductDetails(productName));
-
-
     }
 
 
