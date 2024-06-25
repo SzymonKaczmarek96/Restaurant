@@ -23,6 +23,7 @@ public class ProductService {
     }
 
     public List<ProductDto> getProductList() {
+        //TODO: inline
         List<ProductDto> allRecords = productRepository.findAll().stream().map(Product::toProductDto).toList();
         return allRecords;
     }
@@ -36,6 +37,7 @@ public class ProductService {
     }
 
     public ProductDto createProductIfNotExists(ProductDto productDto) {
+        //todo: queries duplication
         if (productRepository.existsByProductName(productDto.productName())) {
             throw new ProductAlreadyExistsException(productDto.productName());
         }
@@ -46,6 +48,7 @@ public class ProductService {
 
     @Transactional
     public ProductDto updateProductByName(String productName, ProductDto productDto) {
+        //todo: queries duplication
         if (!productRepository.existsByProductName(productName)) {
             throw new ProductNotExistsException(productName);
         }
@@ -60,10 +63,13 @@ public class ProductService {
 
     @Transactional
     public void deleteProductDetails(String productName) {
-        if (!productRepository.existsByProductName(productName)) {
+//        if (!productRepository.existsByProductName(productName)) {
+//            throw new ProductNotExistsException(productName);
+//        }
+        var deletedRecords = productRepository.deleteByProductName(productName);
+        if (deletedRecords == 0) {
             throw new ProductNotExistsException(productName);
         }
-        productRepository.deleteByProductName(productName);
     }
 
 

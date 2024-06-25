@@ -12,6 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +25,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-public class TableControllerIntegrationTest extends TestContainer {
+@Testcontainers
+public class TableControllerIntegrationTest  {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15").withDatabaseName("restaurant").withUsername("postgres").withPassword("user");
+
+    @DynamicPropertySource
+    static void configureProperty(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
     @Autowired
     private TableRepository tableRepository;
     @Autowired
@@ -39,6 +56,7 @@ public class TableControllerIntegrationTest extends TestContainer {
         tableRepository.save(table1);
         //when
         List<TableDto> tableList = tableController.tableList().getBody();
+        // todo: not needed
         System.out.println(tableList);
         //then
         assertEquals(HttpStatusCode.valueOf(200), tableController.tableList().getStatusCode());

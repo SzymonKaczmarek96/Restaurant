@@ -24,6 +24,7 @@ public class TableService {
 
     private TableRepository tableRepository;
 
+    //TODO: not needed
     private ProductRepository productRepository;
 
     @Autowired
@@ -40,6 +41,7 @@ public class TableService {
     public List<TableDto> getAllTablesByStatus(String tableStatus) {
         String convertedString = convertString(tableStatus);
         checkTableStatus(convertedString);
+        //TODO: inline
         List<TableDto> findAllFreeTables = tableRepository.findByTableStatus(TableStatus.valueOf(convertedString)).stream().map(Table::tableToDto).toList();
         return findAllFreeTables;
     }
@@ -54,6 +56,7 @@ public class TableService {
     }
 
     public TableDto openTable(Long id) {
+        //TODO: method reference
         Table findTableToOpen = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         findTableToOpen.setAvailableSeats(findTableToOpen.getSeats());
         findTableToOpen.setTableStatus(TableStatus.FREE);
@@ -61,6 +64,7 @@ public class TableService {
     }
 
     public TableDto closeTable(Long id) {
+        //TODO: method reference
         Table findTableToClose = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         findTableToClose.setProductsOnTable(new ProductsOnTable(new HashSet<>()));
         return tableRepository.save(findTableToClose).tableToDto();
@@ -68,6 +72,7 @@ public class TableService {
 
     @Transactional
     public TableDto reservationTable(Long id, int howManyPeoples) {
+        //TODO: method reference
         Table findTableToReservation = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         checkTheNumberOfSeats(findTableToReservation.getSeats(), howManyPeoples);
         findTableToReservation.setTableStatus(TableStatus.OCCUPIED);
@@ -76,6 +81,7 @@ public class TableService {
     }
 
     public TableDto cancelReservation(Long id) {
+        //TODO: method reference
         Table findTableToCancelReservation = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         findTableToCancelReservation.setAvailableSeats(findTableToCancelReservation.getSeats());
         findTableToCancelReservation.setTableStatus(TableStatus.FREE);
@@ -84,6 +90,7 @@ public class TableService {
 
     @Transactional
     public TableDto addProductsToTable(Long id, Set<ProductOnTable> productList) {
+        //TODO: method reference
         Table findTableToModifyOrder = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         Set<ProductOnTable> modifiedProductsOnTable = addToList(findTableToModifyOrder.getProductsOnTable().getProducts(), productList);
         findTableToModifyOrder.setProductsOnTable(new ProductsOnTable(modifiedProductsOnTable));
@@ -92,6 +99,7 @@ public class TableService {
 
     @Transactional
     public TableDto deleteProductsFromTableOrder(Long id, Set<ProductOnTable> productToDelete) {
+        //TODO: method reference
         Table findTableToModifyProductOnTable = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
         Set<ProductOnTable> deleteProductOnTable = deleteProductInList
                 (findTableToModifyProductOnTable.getProductsOnTable().getProducts(), productToDelete);
@@ -107,19 +115,23 @@ public class TableService {
         }
     }
 
+    //TODO: More meaningful name or remove
     private String convertString(String tableStatus) {
+        //TODO: inline
         String upperCase = tableStatus.toUpperCase();
         return upperCase;
     }
 
     private void checkTheNumberOfSeats(int availableSeats, int peoples) {
         if (availableSeats < peoples) {
+            //TODO: custom exception
             throw new IllegalArgumentException();
         }
     }
 
     private void checkIntroducedSeats(int seats) {
         if (seats <= 0) {
+            //TODO: custom exception
             throw new IllegalArgumentException("Seats must be bigger than 0");
         }
     }

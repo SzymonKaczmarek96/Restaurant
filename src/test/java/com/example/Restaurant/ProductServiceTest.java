@@ -18,6 +18,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// todo: check lenient
+
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
     @Mock
@@ -32,6 +34,7 @@ class ProductServiceTest {
         Product product1 = new Product(1L, "Fanta", 1000);
         Product product2 = new Product(1L, "Cola", 1000);
         Product product3 = new Product(1L, "7up", 1000);
+        //TODO: why not pass directly values
         List<Product> products;
         products = Arrays.asList(product, product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
@@ -39,6 +42,8 @@ class ProductServiceTest {
         List<ProductDto> result = productService.getProductList();
         //then
         assertNotNull(result);
+
+        // todo: don't rely on order
         assertEquals("Pepsi", result.get(0).productName());
         assertEquals("Fanta", result.get(1).productName());
         assertEquals("Cola", result.get(2).productName());
@@ -65,6 +70,7 @@ class ProductServiceTest {
     @Test
     void shouldThrowExceptionWhenProductDoesNotExist() {
         //given
+        // todo: not needed
         Product product = new Product(1L, "Pepsi", 1000);
         //when
         when(productRepository.existsByProductName("Sprite")).thenReturn(false);
@@ -79,8 +85,6 @@ class ProductServiceTest {
         //given
         Product product = new Product(2L, "Pepsi", 1000);
         ProductDto productDto = new ProductDto("Coffee", 1000);
-        lenient().when(productRepository.existsByProductName(product.getProductName())).thenReturn(false);
-        lenient().when(productRepository.findByProductName(product.getProductName())).thenReturn(null);
         when(productRepository.save(any(Product.class))).thenReturn(new Product(1L, productDto.productName(), productDto.price()));
         //when
         ProductDto productIfNotExists = productService.createProductIfNotExists(productDto);
@@ -167,9 +171,6 @@ class ProductServiceTest {
     void shouldNotDeleteProductWhenNotExist() {
         //given
         String productName = "Water";
-
-        //when
-        when(productRepository.existsByProductName(productName)).thenReturn(false);
 
         //then
         assertThrows(ProductNotExistsException.class, () -> productService.deleteProductDetails(productName));

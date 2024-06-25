@@ -27,6 +27,7 @@ public class TableController {
         return ResponseEntity.ok(createdList);
     }
 
+    // todo: query param
     @GetMapping("/status/{tableStatus}")
     public ResponseEntity<List<TableDto>> tableStatusList(@PathVariable String tableStatus) {
         List<TableDto> checkedTableStatusList = tableService.getAllTablesByStatus(tableStatus);
@@ -39,18 +40,22 @@ public class TableController {
         return ResponseEntity.ok().body(createdTable);
     }
 
-    @PutMapping("/open")
+    // todo: path param
+    // /table/{id}/open
+    @PutMapping("/{id}/open")
     public ResponseEntity<TableDto> openPaidTable(@RequestParam("id") Long id) {
         TableDto changedTableStatus = tableService.openTable(id);
         return ResponseEntity.ok(changedTableStatus);
     }
 
+    // todo: path param
     @PutMapping("/close")
     public ResponseEntity<TableDto> closePaidTable(@RequestParam("id") Long id) {
         TableDto changedTableStatus = tableService.closeTable(id);
         return ResponseEntity.ok(changedTableStatus);
     }
 
+    // todo: path param
     @PutMapping("/reservation")
     public ResponseEntity<TableDto> tableReservation(@RequestParam("id") Long id, @RequestBody int howManyPeople) {
         validateNumberOfPeople(howManyPeople);
@@ -58,18 +63,21 @@ public class TableController {
         return ResponseEntity.ok().body(changedTableStatus);
     }
 
+    // todo: path param
     @PutMapping("/cancel")
     public ResponseEntity<TableDto> cancelOccupied(@RequestParam("id") Long id) {
         TableDto changedTableStatus = tableService.cancelReservation(id);
         return ResponseEntity.ok(changedTableStatus);
     }
 
+    // todo: path param
     @PutMapping("/order")
     public ResponseEntity<TableDto> changeOrder(@RequestParam("id") Long id, @RequestBody Set<ProductOnTable> productList) {
         TableDto changedOrder = tableService.addProductsToTable(id, productList);
         return ResponseEntity.ok().body(changedOrder);
     }
 
+    // todo: path param
     @PutMapping("/delete")
     public ResponseEntity<TableDto> deleteOrderList(@RequestParam("id") Long id, @RequestBody Set<ProductOnTable> productList) {
         TableDto deleteProductsToTableOrderOrder = tableService.deleteProductsFromTableOrder(id, productList);

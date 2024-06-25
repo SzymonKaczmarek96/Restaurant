@@ -14,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+// todo: not needed
 @Component
 public class ProductsOnTable implements Serializable {
     private Set<ProductOnTable> products = new HashSet<>();

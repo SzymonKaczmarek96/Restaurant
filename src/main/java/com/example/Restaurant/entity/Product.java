@@ -39,6 +39,7 @@ public class Product implements Serializable {
 
     public void setPrice(int price) {
         if (price < 0) {
+            // todo: custom exception
             throw new IllegalArgumentException("Price can't be less than 0");
         }
         this.price = price;

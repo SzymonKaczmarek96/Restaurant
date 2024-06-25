@@ -11,11 +11,27 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
 @SpringBootTest
-public class ProductControllerIntegrationTest extends TestContainer {
+@Testcontainers
+public class ProductControllerIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15").withDatabaseName("restaurant").withUsername("postgres").withPassword("user");
+
+    @DynamicPropertySource
+    static void configureProperty(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @Autowired
     private ProductController productController;
@@ -39,17 +55,15 @@ public class ProductControllerIntegrationTest extends TestContainer {
         Product product3 = new Product(14L, "Pepsi", 4000);
         Product product4 = new Product(16L, "White Coffee", 5000);
         Product product5 = new Product(20L, "Latte", 10000);
-        productRepository.save(product);
-        productRepository.save(product1);
-        productRepository.save(product2);
-        productRepository.save(product3);
-        productRepository.save(product4);
-        productRepository.save(product5);
+        productRepository.saveAll(List.of(product, product1, product2, product3, product4, product5));
+
         //when
         List<ProductDto> productDtoList = productController.displayProductList().getBody();
         //then
         Assertions.assertEquals(HttpStatusCode.valueOf(200), productController.displayProductList().getStatusCode());
         Assertions.assertEquals(6, productDtoList.size());
+
+        //todo: don't rely on order
         Assertions.assertEquals(product.getProductName(), productDtoList.get(0).productName());
         Assertions.assertEquals(product1.getProductName(), productDtoList.get(1).productName());
         Assertions.assertEquals(product2.getProductName(), productDtoList.get(2).productName());
@@ -66,6 +80,7 @@ public class ProductControllerIntegrationTest extends TestContainer {
         Product product = new Product(1L, "Pepsi", 1000);
         Product product1 = new Product(2L, "Water", 500);
         Product product2 = new Product(3L, "Fanta", 1500);
+        // todo: saveAll
         productRepository.save(product);
         productRepository.save(product1);
         productRepository.save(product2);
@@ -99,6 +114,7 @@ public class ProductControllerIntegrationTest extends TestContainer {
         //given
         Product product = new Product(1L, "Pepsi", 1000);
         Product product1 = new Product(2L, "7UP", 1000);
+        // todo: saveAll
         productRepository.save(product);
         productRepository.save(product1);
 

@@ -34,11 +34,13 @@ public class Table {
 
     @Column(name = "products_on_table", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
+    //TODO: remove
     @Setter
     private ProductsOnTable productsOnTable;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "table_status", nullable = false)
+    //TODO: remove
     @Setter
     private TableStatus tableStatus;
 
@@ -47,6 +49,7 @@ public class Table {
     private int valueOfTheBill;
 
     public TableDto tableToDto() {
+        //TODO: inline
         TableDto tableDto = new TableDto(seats, availableSeats, productsOnTable, tableStatus, valueOfTheBill);
         return tableDto;
     }
