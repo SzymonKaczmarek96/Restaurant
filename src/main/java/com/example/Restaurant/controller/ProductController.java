@@ -38,13 +38,13 @@ public class ProductController {
         return ResponseEntity.ok().body(createTheNewProduct);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ProductDto> updateProductDetails(@RequestParam String productName, @RequestBody ProductDto productDto) {
+    @PutMapping("/{productName}/update")
+    public ResponseEntity<ProductDto> updateProductDetails(@PathVariable String productName, @RequestBody ProductDto productDto) {
         ProductDto updatedProductDetails = productService.updateProductByName(productName, productDto);
         return ResponseEntity.ok().body(updatedProductDetails);
     }
 
-    @DeleteMapping("/delete/{productName}")
+    @DeleteMapping("/{productName}/delete")
     public ResponseEntity deleteProduct(@PathVariable String productName) {
         productService.deleteProductDetails(productName);
         return ResponseEntity.noContent().build();

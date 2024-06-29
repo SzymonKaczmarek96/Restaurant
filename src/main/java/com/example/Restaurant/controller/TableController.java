@@ -76,7 +76,6 @@ public class TableController {
         return ResponseEntity.ok().body(deleteProductsToTableOrderOrder);
     }
 
-
     private void validateNumberOfPeople(int howManyPeople) {
         if (howManyPeople < 0) {
             throw new IllegalArgumentException("Number of people must be zero or positive.");
