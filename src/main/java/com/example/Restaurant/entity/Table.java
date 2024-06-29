@@ -34,12 +34,10 @@ public class Table {
 
     @Column(name = "products_on_table", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
-    @Setter
     private ProductsOnTable productsOnTable;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "table_status", nullable = false)
-    @Setter
     private TableStatus tableStatus;
 
     @JsonProperty("value_of_bill")
@@ -47,8 +45,7 @@ public class Table {
     private int valueOfTheBill;
 
     public TableDto tableToDto() {
-        TableDto tableDto = new TableDto(seats, availableSeats, productsOnTable, tableStatus, valueOfTheBill);
-        return tableDto;
+        return new TableDto(seats, availableSeats, productsOnTable, tableStatus, valueOfTheBill);
     }
 
     public Table(int seats) {

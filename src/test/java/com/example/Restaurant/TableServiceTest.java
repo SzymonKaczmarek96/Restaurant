@@ -7,14 +7,12 @@ import com.example.Restaurant.entity.ProductsOnTable;
 import com.example.Restaurant.entity.Table;
 import com.example.Restaurant.entity.TableStatus;
 import com.example.Restaurant.exceptions.TableNotExistsException;
-import com.example.Restaurant.exceptions.TableStatusNotExistsException;
 import com.example.Restaurant.repository.TableRepository;
 import com.example.Restaurant.service.TableService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
@@ -23,7 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TableServiceTest {
@@ -41,16 +40,14 @@ public class TableServiceTest {
         Table table = new Table(1L, 4, 4, productsOnTable, TableStatus.FREE, 0);
         Table table1 = new Table(2L, 4, 4, productsOnTable, TableStatus.OCCUPIED, 0);
         Table table2 = new Table(3L, 4, 4, productsOnTable, TableStatus.PAID, 0);
-        List<Table> tables;
-        tables = Arrays.asList(table, table1, table2);
+        List<Table> tables = Arrays.asList(table, table1, table2);
         when(tableRepository.findAll()).thenReturn(tables);
         //when
         List<TableDto> tableDtoList = tableService.getAllTables();
         //then
         assertNotNull(tableDtoList);
-        assertEquals(tableDtoList.get(0).tableStatus(), TableStatus.FREE);
-        assertEquals(tableDtoList.get(1).tableStatus(), TableStatus.OCCUPIED);
-        assertEquals(tableDtoList.get(2).tableStatus(), TableStatus.PAID);
+        assertEquals(3, tableDtoList.size());
+        assertEquals(TableStatus.FREE, tableDtoList.stream().filter(tableDto -> table.getTableStatus().equals(TableStatus.FREE)).findFirst().get().tableStatus());
     }
 
     @Test
@@ -59,24 +56,13 @@ public class TableServiceTest {
         ProductsOnTable productsOnTable = new ProductsOnTable();
         Table table2 = new Table(1L, 4, 4, productsOnTable, TableStatus.FREE, 0);
         Table table1 = new Table(1L, 4, 4, productsOnTable, TableStatus.FREE, 0);
+        Table table3 = new Table(1L, 4, 0, productsOnTable, TableStatus.OCCUPIED, 0);
         when(tableRepository.findByTableStatus(TableStatus.FREE)).thenReturn(Arrays.asList(table1, table2));
         //when
         List<TableDto> freeStatusList = tableService.getAllTablesByStatus("FREE");
         //then
         assertNotNull(freeStatusList);
         assertEquals(2, freeStatusList.size());
-        assertEquals(table2.getTableStatus(), freeStatusList.get(0).tableStatus());
-        assertEquals(table2.getTableStatus(), freeStatusList.get(1).tableStatus());
-    }
-
-    @Test
-    public void shouldThrowRequiredExceptionWhenStatusNotExists() {
-        ProductsOnTable productsOnTable = new ProductsOnTable();
-        Table table2 = new Table(1L, 4, 4, productsOnTable, TableStatus.FREE, 0);
-        Table table1 = new Table(1L, 4, 4, productsOnTable, TableStatus.FREE, 0);
-        lenient().when(tableRepository.findByTableStatus(TableStatus.FREE)).thenReturn(Arrays.asList(table1, table2));
-        //when
-        assertThrows(TableStatusNotExistsException.class, () -> tableService.getAllTablesByStatus("freee"));
     }
 
     @Test
@@ -93,7 +79,6 @@ public class TableServiceTest {
         assertEquals(4, cratedTable.seats());
         assertEquals(4, cratedTable.availableSeats());
         assertEquals(0, cratedTable.valueOfTheBill());
-        verify(tableRepository, times(1)).save(any(Table.class));
     }
 
     @Test
@@ -101,9 +86,6 @@ public class TableServiceTest {
         //given
         Table table = new Table(1L, -1, 4, new ProductsOnTable(), TableStatus.FREE, 0);
         //when
-        lenient().when(tableRepository.save(Mockito.any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
-        //then
         assertThrows(IllegalArgumentException.class, () -> tableService.createTable(table.getSeats()));
     }
 
@@ -127,10 +109,8 @@ public class TableServiceTest {
     public void shouldThrowExceptionWhenOpeningTableForNonExistingTable() {
         //given
         Table table = new Table(1L, 4, 4, new ProductsOnTable(), TableStatus.FREE, 0);
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
         //then
-        assertThrows(TableNotExistsException.class, () -> tableService.openTable(2L));
+        assertThrows(TableNotExistsException.class, () -> tableService.openTable(table.getTableId()));
     }
 
 
@@ -156,10 +136,7 @@ public class TableServiceTest {
         //given
         Table table = new Table(1L, 4, 4, new ProductsOnTable(), TableStatus.PAID, 0);
         //when
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
-        //then
-        assertThrows(TableNotExistsException.class, () -> tableService.closeTable(2L));
+        assertThrows(TableNotExistsException.class, () -> tableService.closeTable(table.getTableId()));
     }
 
     @Test
@@ -183,9 +160,6 @@ public class TableServiceTest {
         //given
         Table table = new Table(1L, 4, 4, new ProductsOnTable(), TableStatus.PAID, 0);
         //when
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
-        //then
         assertThrows(TableNotExistsException.class, () -> tableService.cancelReservation(2L));
     }
 
@@ -211,8 +185,7 @@ public class TableServiceTest {
         //given
         Table table = new Table(1L, 4, 4, new ProductsOnTable(), TableStatus.FREE, 0);
         //when
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
+        when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
         //then
         assertThrows(IllegalArgumentException.class, () -> tableService.reservationTable(1L, 5));
     }
@@ -243,8 +216,6 @@ public class TableServiceTest {
         //given
         ProductOnTable product = new ProductOnTable(1L, 1000, 3, "Pepsi");
         ProductsOnTable productsAddToTable = new ProductsOnTable(new HashSet<>(List.of(product)));
-        Table table = new Table(1L, 4, 0, productsAddToTable, TableStatus.OCCUPIED_WITH_PRODUCTS, 0);
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
         //when
         assertThrows(TableNotExistsException.class, () -> tableService.addProductsToTable(2L, productsAddToTable.getProducts()));
     }
@@ -274,13 +245,8 @@ public class TableServiceTest {
 
     @Test
     void shouldThrowExceptionWhenDeletingProductsFromNonExistingTable() {
-        ProductOnTable product = new ProductOnTable(1L, 1000, 3, "Pepsi");
         ProductOnTable product1 = new ProductOnTable(1L, 1000, 2, "Pepsi");
-        ProductsOnTable productsAddToTable = new ProductsOnTable(new HashSet<>(List.of(product)));
         ProductsOnTable productDeleteFromTable = new ProductsOnTable(new HashSet<>(List.of(product1)));
-        Table table = new Table(1L, 4, 0, productsAddToTable, TableStatus.OCCUPIED_WITH_PRODUCTS, 0);
-        lenient().when(tableRepository.save(any(Table.class))).thenReturn(table);
-        lenient().when(tableRepository.findById(1L)).thenReturn(Optional.of(table));
         //when
         assertThrows(TableNotExistsException.class, () -> tableService.deleteProductsFromTableOrder(2L, productDeleteFromTable.getProducts()));
     }

@@ -23,22 +23,19 @@ public class ProductService {
     }
 
     public List<ProductDto> getProductList() {
-        List<ProductDto> allRecords = productRepository.findAll().stream().map(Product::toProductDto).toList();
-        return allRecords;
+        return productRepository.findAll().stream().map(Product::toProductDto).toList();
     }
 
     public ProductDto getProductDetails(String productName) {
-        if (productRepository.existsByProductName(productName)) {
-            Product productDetails = productRepository.findByProductName(productName);
-            return productDetails.toProductDto();
-        }
-        throw new ProductNotExistsException(productName);
+        return productRepository.findByProductName(productName)
+                .orElseThrow(() -> new ProductNotExistsException(productName)).toProductDto();
     }
 
     public ProductDto createProductIfNotExists(ProductDto productDto) {
-        if (productRepository.existsByProductName(productDto.productName())) {
-            throw new ProductAlreadyExistsException(productDto.productName());
-        }
+        productRepository.findByProductName(productDto.productName())
+                .ifPresent(product -> {
+                    throw new ProductAlreadyExistsException(productDto.productName());
+                });
         Product enityProduct = new Product(productDto.productName());
         enityProduct.setPrice(productDto.price());
         return productRepository.save(enityProduct).toProductDto();
@@ -46,10 +43,8 @@ public class ProductService {
 
     @Transactional
     public ProductDto updateProductByName(String productName, ProductDto productDto) {
-        if (!productRepository.existsByProductName(productName)) {
-            throw new ProductNotExistsException(productName);
-        }
-        Product productForUpdate = productRepository.findByProductName(productName);
+        Product productForUpdate = productRepository.findByProductName(productName)
+                .orElseThrow(() -> new ProductNotExistsException(productName));
         if (productForUpdate.getProductName().equals(productDto.productName())) {
             throw new ProductAlreadyExistsException(productForUpdate.getProductName());
         }
@@ -60,10 +55,10 @@ public class ProductService {
 
     @Transactional
     public void deleteProductDetails(String productName) {
-        if (!productRepository.existsByProductName(productName)) {
+        int deleteRecord = productRepository.deleteByProductName(productName);
+        if (deleteRecord == 0) {
             throw new ProductNotExistsException(productName);
         }
-        productRepository.deleteByProductName(productName);
     }
 
 

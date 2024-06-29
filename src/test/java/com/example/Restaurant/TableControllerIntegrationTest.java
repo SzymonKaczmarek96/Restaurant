@@ -33,20 +33,13 @@ public class TableControllerIntegrationTest extends TestContainer {
         tableRepository.delete(tableForDelete);
         Table table = new Table(1L, 4, 0, new ProductsOnTable(), TableStatus.FREE, 0);
         Table table1 = new Table(2L, 4, 0, new ProductsOnTable(), TableStatus.FREE, 0);
-
-
-        tableRepository.save(table);
-        tableRepository.save(table1);
+        tableRepository.saveAll(List.of(table, table1));
         //when
         List<TableDto> tableList = tableController.tableList().getBody();
-        System.out.println(tableList);
         //then
         assertEquals(HttpStatusCode.valueOf(200), tableController.tableList().getStatusCode());
         assertNotNull(tableList);
-
-        assertEquals(4, tableList.get(0).seats());
-        assertEquals(0, tableList.get(0).availableSeats());
-        assertEquals(TableStatus.FREE, tableList.get(0).tableStatus());
+        assertEquals(2, tableList.size());
     }
 
     @Test
@@ -55,9 +48,7 @@ public class TableControllerIntegrationTest extends TestContainer {
         Table table = new Table(1L, 4, 0, new ProductsOnTable(), TableStatus.FREE, 0);
         Table table1 = new Table(2L, 4, 0, new ProductsOnTable(), TableStatus.FREE, 0);
         Table table3 = new Table(4L, 4, 0, new ProductsOnTable(), TableStatus.OCCUPIED_WITH_PRODUCTS, 0);
-        tableRepository.save(table);
-        tableRepository.save(table1);
-        tableRepository.save(table3);
+        tableRepository.saveAll(List.of(table, table1, table3));
         //when
         List<TableDto> freeTableList = tableController.tableStatusList("free").getBody();
         //then

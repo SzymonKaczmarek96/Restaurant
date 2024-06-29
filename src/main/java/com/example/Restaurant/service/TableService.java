@@ -7,8 +7,6 @@ import com.example.Restaurant.entity.ProductsOnTable;
 import com.example.Restaurant.entity.Table;
 import com.example.Restaurant.entity.TableStatus;
 import com.example.Restaurant.exceptions.TableNotExistsException;
-import com.example.Restaurant.exceptions.TableStatusNotExistsException;
-import com.example.Restaurant.repository.ProductRepository;
 import com.example.Restaurant.repository.TableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,12 +22,9 @@ public class TableService {
 
     private TableRepository tableRepository;
 
-    private ProductRepository productRepository;
-
     @Autowired
-    public TableService(TableRepository tableRepository, ProductRepository productRepository) {
+    public TableService(TableRepository tableRepository) {
         this.tableRepository = tableRepository;
-        this.productRepository = productRepository;
     }
 
     public List<TableDto> getAllTables() {
@@ -38,10 +33,8 @@ public class TableService {
 
 
     public List<TableDto> getAllTablesByStatus(String tableStatus) {
-        String convertedString = convertString(tableStatus);
-        checkTableStatus(convertedString);
-        List<TableDto> findAllFreeTables = tableRepository.findByTableStatus(TableStatus.valueOf(convertedString)).stream().map(Table::tableToDto).toList();
-        return findAllFreeTables;
+        return tableRepository.findByTableStatus(TableStatus.valueOf(tableStatus.toUpperCase()))
+                .stream().map(Table::tableToDto).toList();
     }
 
     public TableDto createTable(int seats) {
@@ -54,21 +47,21 @@ public class TableService {
     }
 
     public TableDto openTable(Long id) {
-        Table findTableToOpen = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToOpen = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         findTableToOpen.setAvailableSeats(findTableToOpen.getSeats());
         findTableToOpen.setTableStatus(TableStatus.FREE);
         return tableRepository.save(findTableToOpen).tableToDto();
     }
 
     public TableDto closeTable(Long id) {
-        Table findTableToClose = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToClose = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         findTableToClose.setProductsOnTable(new ProductsOnTable(new HashSet<>()));
         return tableRepository.save(findTableToClose).tableToDto();
     }
 
     @Transactional
     public TableDto reservationTable(Long id, int howManyPeoples) {
-        Table findTableToReservation = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToReservation = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         checkTheNumberOfSeats(findTableToReservation.getSeats(), howManyPeoples);
         findTableToReservation.setTableStatus(TableStatus.OCCUPIED);
         findTableToReservation.setAvailableSeats(findTableToReservation.getSeats() - howManyPeoples);
@@ -76,7 +69,7 @@ public class TableService {
     }
 
     public TableDto cancelReservation(Long id) {
-        Table findTableToCancelReservation = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToCancelReservation = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         findTableToCancelReservation.setAvailableSeats(findTableToCancelReservation.getSeats());
         findTableToCancelReservation.setTableStatus(TableStatus.FREE);
         return tableRepository.save(findTableToCancelReservation).tableToDto();
@@ -84,7 +77,7 @@ public class TableService {
 
     @Transactional
     public TableDto addProductsToTable(Long id, Set<ProductOnTable> productList) {
-        Table findTableToModifyOrder = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToModifyOrder = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         Set<ProductOnTable> modifiedProductsOnTable = addToList(findTableToModifyOrder.getProductsOnTable().getProducts(), productList);
         findTableToModifyOrder.setProductsOnTable(new ProductsOnTable(modifiedProductsOnTable));
         return tableRepository.save(findTableToModifyOrder).tableToDto();
@@ -92,24 +85,11 @@ public class TableService {
 
     @Transactional
     public TableDto deleteProductsFromTableOrder(Long id, Set<ProductOnTable> productToDelete) {
-        Table findTableToModifyProductOnTable = tableRepository.findById(id).orElseThrow(() -> new TableNotExistsException());
+        Table findTableToModifyProductOnTable = tableRepository.findById(id).orElseThrow(TableNotExistsException::new);
         Set<ProductOnTable> deleteProductOnTable = deleteProductInList
                 (findTableToModifyProductOnTable.getProductsOnTable().getProducts(), productToDelete);
         findTableToModifyProductOnTable.setProductsOnTable(new ProductsOnTable(deleteProductOnTable));
         return tableRepository.save(findTableToModifyProductOnTable).tableToDto();
-    }
-
-    private void checkTableStatus(String tableStatus) {
-        try {
-            TableStatus.valueOf(tableStatus);
-        } catch (IllegalArgumentException e) {
-            throw new TableStatusNotExistsException(tableStatus);
-        }
-    }
-
-    private String convertString(String tableStatus) {
-        String upperCase = tableStatus.toUpperCase();
-        return upperCase;
     }
 
     private void checkTheNumberOfSeats(int availableSeats, int peoples) {

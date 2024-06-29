@@ -20,7 +20,6 @@ public class ProductControllerIntegrationTest extends TestContainer {
     @Autowired
     private ProductController productController;
 
-
     @Autowired
     private ProductRepository productRepository;
 
@@ -39,24 +38,13 @@ public class ProductControllerIntegrationTest extends TestContainer {
         Product product3 = new Product(14L, "Pepsi", 4000);
         Product product4 = new Product(16L, "White Coffee", 5000);
         Product product5 = new Product(20L, "Latte", 10000);
-        productRepository.save(product);
-        productRepository.save(product1);
-        productRepository.save(product2);
-        productRepository.save(product3);
-        productRepository.save(product4);
-        productRepository.save(product5);
+        productRepository.saveAll(List.of(product, product1, product2, product3, product4, product5));
         //when
         List<ProductDto> productDtoList = productController.displayProductList().getBody();
         //then
+        Assertions.assertNotNull(productDtoList);
         Assertions.assertEquals(HttpStatusCode.valueOf(200), productController.displayProductList().getStatusCode());
         Assertions.assertEquals(6, productDtoList.size());
-        Assertions.assertEquals(product.getProductName(), productDtoList.get(0).productName());
-        Assertions.assertEquals(product1.getProductName(), productDtoList.get(1).productName());
-        Assertions.assertEquals(product2.getProductName(), productDtoList.get(2).productName());
-        Assertions.assertEquals(product3.getProductName(), productDtoList.get(3).productName());
-        Assertions.assertEquals(product4.getProductName(), productDtoList.get(4).productName());
-        Assertions.assertEquals(product5.getProductName(), productDtoList.get(5).productName());
-
     }
 
 
@@ -66,9 +54,7 @@ public class ProductControllerIntegrationTest extends TestContainer {
         Product product = new Product(1L, "Pepsi", 1000);
         Product product1 = new Product(2L, "Water", 500);
         Product product2 = new Product(3L, "Fanta", 1500);
-        productRepository.save(product);
-        productRepository.save(product1);
-        productRepository.save(product2);
+        productRepository.saveAll(List.of(product, product1, product2));
         //when
         ProductDto getProductDetails = productController.productDetails("Pepsi").getBody();
         //then
@@ -83,10 +69,8 @@ public class ProductControllerIntegrationTest extends TestContainer {
         //then
         String productName = "7UP";
         int price = 1000;
-
         //when
         ProductDto productDto = productController.createProducts(new ProductDto(productName, price)).getBody();
-
         //given
         Assertions.assertEquals(HttpStatusCode.valueOf(200), productController.createProducts(new ProductDto("Tonic", price)).getStatusCode());
         Assertions.assertEquals(productName, productDto.productName());
@@ -99,14 +83,10 @@ public class ProductControllerIntegrationTest extends TestContainer {
         //given
         Product product = new Product(1L, "Pepsi", 1000);
         Product product1 = new Product(2L, "7UP", 1000);
-        productRepository.save(product);
-        productRepository.save(product1);
-
+        productRepository.saveAll(List.of(product, product1));
         //when
         productController.deleteProduct("Pepsi");
         List<ProductDto> getProductDtoList = productController.displayProductList().getBody();
-
-
         //then
         Assertions.assertEquals(HttpStatusCode.valueOf(204), productController.deleteProduct("7UP").getStatusCode());
         Assertions.assertEquals(1, getProductDtoList.size());

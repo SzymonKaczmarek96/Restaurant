@@ -47,8 +47,7 @@ public class TableTest {
         assertEquals(TableStatus.OCCUPIED_WITH_PRODUCTS, table.getTableStatus());
         assertEquals(12000, table.getValueOfTheBill());
     }
-
-
+    
     @Test
     void shouldClearProductsAndUpdateTableStatusToPaidWhenProductsAreRemoved() {
         //then

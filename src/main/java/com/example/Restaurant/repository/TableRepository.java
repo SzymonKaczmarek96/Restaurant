@@ -12,7 +12,5 @@ import java.util.List;
 @Repository
 public interface TableRepository extends JpaRepository<Table, Long> {
 
-    boolean existsByTableId(Long tableId);
-
     List<Table> findByTableStatus(TableStatus tableStatus);
 }

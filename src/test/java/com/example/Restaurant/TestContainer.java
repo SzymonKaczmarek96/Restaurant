@@ -1,21 +1,22 @@
 package com.example.Restaurant;
 
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
-@Testcontainers
 public class TestContainer {
-
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15").withDatabaseName("restaurant").withUsername("postgres").withPassword("user");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>
+            ("postgres:15")
+            .withDatabaseName("restaurant")
+            .withUsername("postgres")
+            .withPassword("user")
+            .withReuse(true);
 
     @DynamicPropertySource
     static void configureProperty(DynamicPropertyRegistry registry) {
@@ -28,11 +29,4 @@ public class TestContainer {
     static void beforeAll() {
         postgres.start();
     }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-    }
-
-
 }
