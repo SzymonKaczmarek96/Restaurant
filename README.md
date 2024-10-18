@@ -57,7 +57,7 @@ Contains unit and integration tests for ensuring the reliability of the applicat
 
 1. Clone this repo
 ```
-git clone https://github.com/SzymonKaczmarek96/WMS.git
+git clone https://github.com/SzymonKaczmarek96/Restaurant.git
 ```
 2.Build the project using Maven
 ```
